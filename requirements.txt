@@ -1,2 +1,3 @@
-# Playwright: o Agent detecta a palavra "playwright" e roda playwright install chromium após o pip.
+# Playwright: Necessário para automação web na GSH Corp.
+# O Agent detecta a palavra "playwright" e instala as dependências automaticamente.
 playwright>=1.49.0,<2

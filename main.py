@@ -1,5 +1,5 @@
 """
-Robô de teste — abre a home da Claro no Chromium (Playwright) e valida HTTP 200.
+Robô de teste — abre a página de histórico da GSH Corp no Chromium (Playwright) e valida HTTP 200.
 
 Depois mantém o navegador aberto por alguns minutos (útil para demo e logs no dashboard).
 O Agent clona o repositório, roda pip + playwright install quando há playwright no requirements.
@@ -12,8 +12,8 @@ import time
 
 from playwright.sync_api import sync_playwright
 
-# Página alvo da demonstração
-URL_CLARO = "https://www.claro.com.br/"
+# Página alvo da demonstração (MODIFICADA)
+URL_ALVO = "https://ri.gshcorp.com.br/sobre-a-gsh-corp/breve-historico/"
 
 # Fase extra: processo vivo para timeout / logs (ajuste se o agendamento tiver timeout menor)
 DURACAO_EXTRA_SEG = 1 * 10
@@ -30,7 +30,7 @@ def main() -> None:
     headless = _headless()
     # Deixa explícito no painel: headless=True não abre janela (PLAYWRIGHT_HEADLESS=false no agente)
     modo = "sem janela (headless)" if headless else "com janela visível"
-    print(f"Iniciando Playwright — Chromium ({modo}). URL: {URL_CLARO}")
+    print(f"Iniciando Playwright — Chromium ({modo}). URL: {URL_ALVO}")
     if not headless:
         print(
             "Dica: se não aparecer janela, use Alt+Tab ou veja 'Chromium' na barra de tarefas / outro monitor."
@@ -45,12 +45,12 @@ def main() -> None:
         browser = p.chromium.launch(headless=headless, args=launch_args)
         context = browser.new_context(
             locale="pt-BR",
-            user_agent="OrquestradorClaro-RPA-Test/Playwright/1.0",
+            user_agent="OrquestradorGSH-RPA-Test/Playwright/1.0",
         )
         page = context.new_page()
         try:
             # Navegação principal: espera DOM (mais estável que networkidle em sites grandes)
-            response = page.goto(URL_CLARO, wait_until="domcontentloaded", timeout=60_000)
+            response = page.goto(URL_ALVO, wait_until="domcontentloaded", timeout=60_000)
         except Exception as e:
             print(f"ERRO ao carregar a página: {e}")
             context.close()
@@ -77,7 +77,7 @@ def main() -> None:
             time.sleep(dormir)
             passo += 1
             restante = max(0, int(fim - time.monotonic()))
-            print(f"Ainda em execução… passo {passo} — ~{restante}s restantes (aba Claro aberta).")
+            print(f"Ainda em execução… passo {passo} — ~{restante}s restantes (aba GSH aberta).")
 
         print("Espera concluída. Fechando navegador.")
         context.close()

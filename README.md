@@ -1,26 +1,22 @@
-# ComboMulti_R2 — fonte original e backup no monorepo
+# ComboMulti_R2 — Automação GSH Corp
 
 ## Fonte original (código executado pelo Agent)
 
 A fonte original deste robô fica no repositório:
+`D:\__PROJETOS 2026\6_GSH\Automações\Testando o Pipeline com rocketbot\Código Python a ser modificado\Gsh\GSH`
 
-`C:\Rpa\MauroGuimaraes-dev\ComboMulti_R2`
+O Agent executa o código vindo da URL Git cadastrada no Orquestrador via `git clone`.
 
-Esse repositório é o que deve ser publicado no remoto (GitHub/GitLab) usado no cadastro do robô no Orquestrador.
-O Agent sempre executa o código vindo da URL Git cadastrada em `TB_ROBOTS` (`gitlab_repo_url`), via `git clone`.
+## Pasta no monorepo (`robos/GSH`)
 
-## Pasta no monorepo (`robos/ComboMulti_R2`)
-
-Esta pasta no OrquestradorClaro (`robos/ComboMulti_R2/`) é apenas um **backup versionado** (espelho de referência) para histórico e documentação.
-
+Esta pasta é um **backup versionado** (espelho de referência) para histórico e documentação.
 Ela **não é** a fonte primária de execução do Agent.
 
 ## Fluxo recomendado
 
-1. Editar e validar primeiro em `C:\Rpa\MauroGuimaraes-dev\ComboMulti_R2`.
-2. Fazer commit/push no repositório remoto oficial do robô.
-3. Copiar para `robos/ComboMulti_R2/` no monorepo apenas para manter o backup commitado alinhado.
+1. Editar e validar primeiro em `D:\__PROJETOS 2026\6_GSH\Automações\Testando o Pipeline com rocketbot\Código Python a ser modificado\Gsh\GSH`.
+2. Fazer commit/push no repositório remoto oficial do robô (GitHub).
+3. Copiar para a pasta de backup no monorepo para manter o histórico alinhado.
 
-## Cópia em `examples/`
-
-`examples/robo-claro-playwright/` mantém uma versão espelho para roteiro/template técnico.
+## Descrição Técnica
+Este robô utiliza **Playwright** para acessar o portal de RI da GSH Corp e validar a disponibilidade da página de histórico.
