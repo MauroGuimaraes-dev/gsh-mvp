@@ -12,12 +12,12 @@ import time
 
 from playwright.sync_api import sync_playwright
 
-# Página alvo da demonstração (MODIFICADA)
+# Página alvo da demonstração
 URL_ALVO = "https://ri.gshcorp.com.br/sobre-a-gsh-corp/breve-historico/"
 
-# Fase extra: processo vivo para timeout / logs (ajuste se o agendamento tiver timeout menor)
-DURACAO_EXTRA_SEG = 1 * 10
-INTERVALO_LOG_SEG = 5
+# Tempo com o navegador aberto após carregar (demo: 2 min; reduza se o timeout do agendamento for menor)
+DURACAO_EXTRA_SEG = 2 * 60
+INTERVALO_LOG_SEG = 10
 
 
 def _headless() -> bool:
@@ -26,30 +26,41 @@ def _headless() -> bool:
     return v in ("1", "true", "yes", "on")
 
 
+def _playwright_channel() -> str | None:
+    """Lê PLAYWRIGHT_CHANNEL do agent/.env (ex.: chrome) repassado pelo subprocesso."""
+    v = os.environ.get("PLAYWRIGHT_CHANNEL", "").strip()
+    return v or None
+
+
 def main() -> None:
     headless = _headless()
-    # Deixa explícito no painel: headless=True não abre janela (PLAYWRIGHT_HEADLESS=false no agente)
+    channel = _playwright_channel()
+    navegador = channel or "Chromium (empacotado)"
+
     modo = "sem janela (headless)" if headless else "com janela visível"
-    print(f"Iniciando Playwright — Chromium ({modo}). URL: {URL_ALVO}")
+    print(f"Iniciando Playwright — {navegador} ({modo}). URL: {URL_ALVO}")
     if not headless:
         print(
-            "Dica: se não aparecer janela, use Alt+Tab ou veja 'Chromium' na barra de tarefas / outro monitor."
+            "Dica: se não aparecer janela, use Alt+Tab ou veja Chrome/Chromium na barra de tarefas / outro monitor."
         )
 
-    # Com headless=False, argumentos extras reduzem chance da janela abrir minimizada ou fora da tela
     launch_args: list[str] = []
     if not headless:
         launch_args = ["--start-maximized", "--window-position=0,0"]
 
+    launch_kw: dict = {"headless": headless, "args": launch_args}
+    if channel:
+        launch_kw["channel"] = channel
+
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=headless, args=launch_args)
+        browser = p.chromium.launch(**launch_kw)
         context = browser.new_context(
             locale="pt-BR",
             user_agent="OrquestradorGSH-RPA-Test/Playwright/1.0",
+            no_viewport=not headless,
         )
         page = context.new_page()
         try:
-            # Navegação principal: espera DOM (mais estável que networkidle em sites grandes)
             response = page.goto(URL_ALVO, wait_until="domcontentloaded", timeout=60_000)
         except Exception as e:
             print(f"ERRO ao carregar a página: {e}")
@@ -67,7 +78,12 @@ def main() -> None:
         titulo = page.title()
         print(f"OK — página carregada (HTTP 200). Título: {titulo[:160]!r}")
 
-        # Mantém sessão aberta com logs periódicos (aparecem em TB_EXECUTION_LOGS)
+        if not headless:
+            try:
+                page.bring_to_front()
+            except Exception:
+                pass
+
         fim = time.monotonic() + DURACAO_EXTRA_SEG
         passo = 0
         while time.monotonic() < fim:
