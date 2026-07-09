@@ -1,4 +1,4 @@
-# ComboMulti_R2 — Automação GSH Corp
+# Automação GSH Corp  -  Robô que abre a página do GSH
 
 ## Fonte original (código executado pelo Agent)
 
